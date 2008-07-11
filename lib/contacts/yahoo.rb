@@ -20,7 +20,7 @@ class Contacts
         raise AuthenticationError, "Username and password do not match"
       elsif data.index("Sign in") && data.index("to Yahoo!")
         raise AuthenticationError, "Required field must not be blank"
-      elsif data != ""
+      elsif !data.match(/uncompressed\/chunked/)
         raise ConnectionError, PROTOCOL_ERROR
       elsif cookies == ""
         raise ConnectionError, PROTOCOL_ERROR
