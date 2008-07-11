@@ -6,7 +6,7 @@ class Contacts
     LOGIN_URL           = "https://www.plaxo.com/signin"
     ADDRESS_BOOK_URL    = "http://www.plaxo.com/po3/?module=ab&operation=viewFull&mode=normal"
     CONTACT_LIST_URL    = "http://www.plaxo.com/axis/soap/contact?_action=getContacts&_format=xml"
-    PROTOCOL_ERROR      = "Plaxo has changed its protocols, please upgrade this library first. If that does not work, contact lucas@rufy.com with this error"
+    PROTOCOL_ERROR      = "Plaxo has changed its protocols, please upgrade this library first. If that does not work, dive into the code and submit a patch at http://github.com/cardmagic/contacts"
     
     def real_connect
       

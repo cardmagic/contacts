@@ -6,7 +6,7 @@ class Contacts
     LOGIN_URL           = "https://login.yahoo.com/config/login"
     ADDRESS_BOOK_URL    = "http://address.mail.yahoo.com/?1&VPC=import_export"
     CONTACT_LIST_URL    = "http://address.yahoo.com/index.php?VPC=import_export&A=B&submit[action_export_yahoo]=Export%20Now"
-    PROTOCOL_ERROR      = "Yahoo has changed its protocols, please upgrade this library first. If that does not work, contact lucas@rufy.com with this error"
+    PROTOCOL_ERROR      = "Yahoo has changed its protocols, please upgrade this library first. If that does not work, dive into the code and submit a patch at http://github.com/cardmagic/contacts"
     
     def real_connect
       postdata =  ".tries=2&.src=ym&.md5=&.hash=&.js=&.last=&promo=&.intl=us&.bypass="

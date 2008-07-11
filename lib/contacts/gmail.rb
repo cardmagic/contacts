@@ -6,7 +6,7 @@ class Contacts
     LOGIN_URL           = "https://www.google.com/accounts/ServiceLoginAuth"
     LOGIN_REFERER_URL   = "https://www.google.com/accounts/ServiceLogin?service=mail&passive=true&rm=false&continue=http%3A%2F%2Fmail.google.com%2Fmail%3Fui%3Dhtml%26zy%3Dl&ltmpl=yj_blanco&ltmplcache=2&hl=en"
     CONTACT_LIST_URL    = "https://mail.google.com/mail/contacts/data/contacts?thumb=true&show=ALL&enums=true&psort=Name&max=10000&out=js&rf=&jsx=true"
-    PROTOCOL_ERROR      = "Gmail has changed its protocols, please upgrade this library first. If that does not work, contact lucas@rufy.com with this error"
+    PROTOCOL_ERROR      = "Gmail has changed its protocols, please upgrade this library first. If that does not work, dive into the code and submit a patch at http://github.com/cardmagic/contacts"
     
     def real_connect
       postdata =  "ltmpl=yj_blanco"
