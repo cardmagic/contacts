@@ -67,7 +67,9 @@ class Contacts
       if @contacts != nil
         @contacts = @contacts.delete_if {|c| c["Emails"].nil?}.map do |c|
           name, emails = c.values_at "Name", "Emails"
-          emails = emails.first.values
+          # emails are returned in a form of
+          # [{"Address"=>"home.email@gmail.com"}, {"Type"=>{"Id"=>"WORK"}, "Address"=>"work.email@gmail.com"}]
+          emails = emails.collect{|a| a.values_at("Address")}
           [name, emails].flatten
         end
       else
