@@ -16,7 +16,7 @@ class Contacts
       
       data, resp, cookies, forward = post(LOGIN_URL, postdata)
       
-      if data.index("Invalid ID or password")
+      if data.index("Invalid ID or password") || data.index("This ID is not yet taken")
         raise AuthenticationError, "Username and password do not match"
       elsif data.index("Sign in") && data.index("to Yahoo!")
         raise AuthenticationError, "Required field must not be blank"
