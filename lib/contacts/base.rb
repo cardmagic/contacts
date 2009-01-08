@@ -136,6 +136,9 @@ class Contacts
       cookies = parse_cookies(resp.response['set-cookie'], cookies)
       forward = resp.response['Location']
       forward ||= (data =~ /<meta.*?url='([^']+)'/ ? CGI.unescapeHTML($1) : nil)
+	if (not forward.nil?) && URI.parse(forward).host.nil?
+		forward = url.scheme.to_s + "://" + url.host.to_s + forward
+	end
       return data, resp, cookies, forward
     end
     
@@ -151,6 +154,9 @@ class Contacts
       data = uncompress(resp, data)
       cookies = parse_cookies(resp.response['set-cookie'], cookies)
       forward = resp.response['Location']
+	  if (not forward.nil?) && URI.parse(forward).host.nil?
+		forward = url.scheme.to_s + "://" + url.host.to_s + forward
+	  end
       return data, resp, cookies, forward
     end
     
