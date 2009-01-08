@@ -8,7 +8,7 @@ require "thread"
 
 class Contacts
   TYPES = {}
-  VERSION = "1.0.12"
+  VERSION = "1.0.13"
   
   class Base
     def initialize(login, password)
