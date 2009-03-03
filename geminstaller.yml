@@ -1,0 +1,6 @@
+---
+defaults:
+  install_options: --no-ri --no-rdoc
+gems:
+  - name: json
+    version: >= 1.1.1

@@ -29,9 +29,9 @@ class Contacts
       
       cookies = remove_cookie("GMAIL_LOGIN", cookies)
       
-      if data.index("Username and password do not match")
+      if data.index("The username or password you entered is incorrect")
         raise AuthenticationError, "Username and password do not match"
-      elsif data.index("Required field must not be blank")
+      elsif data.index("We cannot log you into your account at this time") || data.index("Required field cannot be left blank")
         raise AuthenticationError, "Login and password must not be blank"
       elsif data.index("errormsg_0_logincaptcha")
         raise AuthenticationError, "Captcha error"
