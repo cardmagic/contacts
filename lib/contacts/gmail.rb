@@ -1,4 +1,14 @@
-require "json/add/rails"
+begin
+  # If the json gem is available, use it
+  require "json/add/rails"
+rescue MissingSourceFile
+  # Otherwise wrap the ActiveSupport JSON implementation for our simple use case
+  class JSON
+    def self.parse(i)
+      ActiveSupport::JSON.decode(i)
+    end
+  end
+end
 
 class Contacts
   class Gmail < Base
