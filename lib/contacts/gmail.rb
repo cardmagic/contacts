@@ -39,7 +39,7 @@ class Contacts
       
       cookies = remove_cookie("GMAIL_LOGIN", cookies)
 
-      if data.index("Username and password do not match")
+      if data.index("Username and password do not match") || data.index("New to Gmail? It's free and easy")
         raise AuthenticationError, "Username and password do not match"
       elsif data.index("The username or password you entered is incorrect")
         raise AuthenticationError, "Username and password do not match"

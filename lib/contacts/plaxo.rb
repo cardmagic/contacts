@@ -53,7 +53,7 @@ end # Contacts
 
 
 # sample contacts responses
-'
+=begin
 Bad email
 =========
 <?xml version="1.0" encoding="utf-8" ?>
@@ -119,5 +119,4 @@ Success
   <editCounter>3</editCounter>
   
 </ns1:GetContactsResponse>
-
-'
+=end

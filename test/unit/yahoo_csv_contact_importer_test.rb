@@ -25,6 +25,8 @@ class YahooContactImporterTest < ContactImporterTestCase
 
   def test_fetch_contacts
     contacts = Contacts.new(:yahoo, @account.username, @account.password).contacts
-    assert_equal @account.contacts, contacts
+    @account.contacts.each do |contact|
+      assert contacts.include?(contact), "Could not find: #{contact.inspect} in #{contacts.inspect}"
+    end
   end
 end
