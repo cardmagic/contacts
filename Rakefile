@@ -10,7 +10,7 @@ PKG_VERSION = Contacts::VERSION
 
 PKG_FILES = FileList[
     "lib/**/*", "bin/*", "test/**/*", "[A-Z]*", "Rakefile", "doc/**/*", "examples/**/*"
-]
+] - ["test/accounts.yml"]
 
 desc "Default Task"
 task :default => [ :test ]
