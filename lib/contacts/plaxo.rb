@@ -35,11 +35,13 @@ class Contacts
         @contacts = []
         doc.elements.each('//contact') do |cont|
           name = if cont.elements['fullName']
-            cont.elements['fullName']
+            cont.elements['fullName'].text
           elsif cont.elements['displayName']
-            cont.elements['displayName']
+            cont.elements['displayName'].text
           end
-          email = cont.elements['email1'].text
+          email = if cont.elements['email1']
+            cont.elements['email1'].text
+          end
           @contacts << [name, email]
         end.compact
         @contacts
