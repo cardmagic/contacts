@@ -34,7 +34,11 @@ class Contacts
       elsif code == '200'
         @contacts = []
         doc.elements.each('//contact') do |cont|
-          name  = cont.elements['fullName'].nil? ? cont.elements['displayName'].text : cont.elements['fullName'].text
+          name = if cont.elements['fullName']
+            cont.elements['fullName']
+          elsif cont.elements['displayName']
+            cont.elements['displayName']
+          end
           email = cont.elements['email1'].text
           @contacts << [name, email]
         end.compact
