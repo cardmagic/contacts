@@ -42,8 +42,10 @@ class Contacts
           email = if cont.elements['email1']
             cont.elements['email1'].text
           end
-          @contacts << [name, email]
-        end.compact
+          if name || email
+            @contacts << [name, email]
+          end
+        end
         @contacts
       else
         raise ConnectionError, PROTOCOL_ERROR
