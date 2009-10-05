@@ -1,14 +1,12 @@
 # Use ActiveSupport's version of JSON if available
-unless Object.const_defined?('JSON') && Kernel.const_get('JSON').respond_to?('parse')
-  if Object.const_defined?('ActiveSupport') && Kernel.const_get('ActiveSupport').const_defined?('JSON')
-    class JSON
-      def self.parse(i)
-        ActiveSupport::JSON.decode(i)
-      end
+if Object.const_defined?('ActiveSupport') && ActiveSupport.const_defined?('JSON')
+  class JSON
+    def self.parse(i)
+      ActiveSupport::JSON.decode(i)
     end
-  else
-    require 'json/add/rails'
   end
+else
+  require 'json/add/rails'
 end
 
 class Contacts
