@@ -1,10 +1,6 @@
 begin
   # If the json gem is available, use it
-  require 'json'
-  if Object.const_defined?(:Rails)
-    # Only 'fix' Rails' JSON behaviour if it needs fixing.
-    require "json/add/rails" unless Rails::VERSION::MAJOR >= 2 && Rails::VERSION::MINOR >= 3
-  end
+  require "json/add/rails"
 rescue MissingSourceFile
   # Otherwise wrap the ActiveSupport JSON implementation for our simple use case
   class JSON
