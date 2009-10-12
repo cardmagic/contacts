@@ -43,7 +43,7 @@ spec = Gem::Specification.new do |s|
 
   #### Basic information.
 
-  s.name = 'adamhunter-contacts'
+  s.name = 'contacts'
   s.version = PKG_VERSION
   s.summary = <<-EOF
    Ridiculously easy contact list information from various providers including Yahoo, Gmail, and Hotmail
@@ -62,8 +62,7 @@ spec = Gem::Specification.new do |s|
   s.autorequire = 'contacts'
 
   s.add_dependency('json', '>= 0.4.1')
-  s.add_dependency('gdata', '>= 1.1.0')
-  s.requirements << "A json parser, the gdata ruby gem"
+  s.requirements << "A json parser"
 
   #### Documentation and testing.
 
