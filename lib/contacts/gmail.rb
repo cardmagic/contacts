@@ -14,18 +14,14 @@ class Contacts
       
       feed = @client.get(CONTACTS_FEED).to_xml
       
-      @contacts = []
-      feed.elements.each('entry') do |entry|
-        title = entry.elements['title'].text
-        email = nil
+      @contacts = feed.elements.to_a('entry').collect do |entry|
+        title, email = entry.elements['title'].text, nil
         entry.elements.each('gd:email') do |e|
-          if e.attribute('primary')
-            email = e.attribute('address').value
-          end
+          email = e.attribute('address').value if e.attribute('primary')
         end
-        @contacts << [title, email] unless email.nil?
+        [title, email] unless email.nil?
       end
-      @contacts
+      @contacts.compact!
     rescue GData::Client::AuthorizationError => e
       raise Contacts::AuthenticationError
     end
@@ -33,6 +29,5 @@ class Contacts
     private
     
     TYPES[:gmail] = Gmail
-    
   end
 end
