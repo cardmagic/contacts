@@ -6,7 +6,6 @@ class Contacts
     
     def contacts
       return @contacts if @contacts
-      real_connect
     end
     
     def real_connect
@@ -27,7 +26,13 @@ class Contacts
         @contacts << [title, email] unless email.nil?
       end
       @contacts
+    rescue GData::Client::AuthorizationError => e
+      raise Contacts::AuthenticationError
     end
+    
+    private
+    
+    TYPES[:gmail] = Gmail
     
   end
 end
