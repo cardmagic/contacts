@@ -1,5 +1,6 @@
 # Use ActiveSupport's version of JSON if available
-if Object.const_defined?('ActiveSupport') && ActiveSupport.const_defined?('JSON')
+if Object.const_defined?('ActiveSupport') && ActiveSupport.const_defined?('JSON') && ActiveSupport::JSON.is_a?(Class)
+  puts JSON.class
   class JSON
     def self.parse(i)
       ActiveSupport::JSON.decode(i)
