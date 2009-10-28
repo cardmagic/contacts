@@ -5,6 +5,7 @@ require "uri"
 require "zlib"
 require "stringio"
 require "thread"
+require "erb"
 
 class Contacts
   TYPES = {}
@@ -19,7 +20,7 @@ class Contacts
     end
     
     def connect
-      raise AuthenticationError, "Login and password must not be nil, login: #{@login.inspect}, password: #{@password.inspect}" if @login.nil? || @password.nil?
+      raise AuthenticationError, "Login and password must not be nil, login: #{@login.inspect}, password: #{@password.inspect}" if @login.nil? || @login.empty? || @password.nil? || @password.empty?
       real_connect
     end
     
@@ -92,10 +93,14 @@ class Contacts
       http
     end
     
+    def cookie_hash_from_string(cookie_string)
+      cookie_string.split(";").map{|i|i.split("=", 2).map{|j|j.strip}}.inject({}){|h,i|h[i[0]]=i[1];h}
+    end
+    
     def parse_cookies(data, existing="")
       return existing if data.nil?
 
-      cookies = existing.split(";").map{|i|i.split("=", 2).map{|j|j.strip}}.inject({}){|h,i|h[i[0]]=i[1];h}
+      cookies = cookie_hash_from_string(existing)
       
       data.gsub!(/ ?[\w]+=EXPIRED;/,'')
       data.gsub!(/ ?expires=(.*?, .*?)[;,$]/i, ';')

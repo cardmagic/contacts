@@ -9,36 +9,40 @@ else
   require 'json/add/rails'
 end
 
+class Hash
+  def to_query_string
+    u = ERB::Util.method(:u)
+    map { |k, v|
+      u.call(k) + "=" + u.call(v)
+    }.join("&")
+  end
+end
+
 class Contacts
   class Gmail < Base
     URL                 = "https://mail.google.com/mail/"
     LOGIN_URL           = "https://www.google.com/accounts/ServiceLoginAuth"
-    LOGIN_REFERER_URL   = "https://www.google.com/accounts/ServiceLogin?service=mail&passive=true&rm=false&continue=http%3A%2F%2Fmail.google.com%2Fmail%3Fui%3Dhtml%26zy%3Dl&ltmpl=yj_blanco&ltmplcache=2&hl=en"
+    LOGIN_REFERER_URL   = "https://www.google.com/accounts/ServiceLogin?service=mail&passive=true&rm=false&continue=http%3A%2F%2Fmail.google.com%2Fmail%2F%3Fui%3Dhtml%26zy%3Dl&bsv=zpwhtygjntrz&scc=1&ltmpl=default&ltmplcache=2"
     CONTACT_LIST_URL    = "https://mail.google.com/mail/contacts/data/contacts?thumb=true&show=ALL&enums=true&psort=Name&max=10000&out=js&rf=&jsx=true"
     PROTOCOL_ERROR      = "Gmail has changed its protocols, please upgrade this library first. If that does not work, dive into the code and submit a patch at http://github.com/cardmagic/contacts"
     
     def real_connect
-      postdata =  "ltmpl=yj_blanco"
-      postdata += "&continue=%s" % CGI.escape(URL)
-      postdata += "&ltmplcache=2"
-      postdata += "&service=mail"
-      postdata += "&rm=false"
-      postdata += "&ltmpl=yj_blanco"
-      postdata += "&hl=en"
-      postdata += "&Email=%s" % CGI.escape(login)
-      postdata += "&Passwd=%s" % CGI.escape(password)
-      postdata += "&rmShown=1"
-      postdata += "&null=Sign+in"
+      postdata = {
+        "Email" => login,
+        "Passwd" => password,
+        "PersistentCookie" => "yes",
+        "asts" => "",
+        "rmShown" => "1",
+        "signIn" => CGI.escape("Sign in")
+      }
             
-      time =      Time.now.to_i
-      time_past = Time.now.to_i - 8 - rand(12)
-      cookie =    "GMAIL_LOGIN=T#{time_past}/#{time_past}/#{time}"
-      
-      data, resp, cookies, forward, old_url = post(LOGIN_URL, postdata, cookie, LOGIN_REFERER_URL) + [LOGIN_URL]
-      
-      cookies = remove_cookie("GMAIL_LOGIN", cookies)
+      # Get this cookie and stick it in the form to confirm to Google that your cookies work
+      data, resp, cookies, forward = get(LOGIN_REFERER_URL)
+      postdata["GALX"] = cookie_hash_from_string(cookies)["GALX"]
 
-      if data.index("Username and password do not match") || data.index("New to Gmail? It's free and easy")
+      data, resp, cookies, forward, old_url = post(LOGIN_URL, postdata.to_query_string, cookies, LOGIN_REFERER_URL) + [LOGIN_REFERER_URL]
+      
+      if data.index("Username and password do not match")
         raise AuthenticationError, "Username and password do not match"
       elsif data.index("The username or password you entered is incorrect")
         raise AuthenticationError, "Username and password do not match"
@@ -65,7 +69,7 @@ class Contacts
       data.gsub!(/ &&&END&&&$/, '')
       data.gsub!(/\t/, ' ') # tabs in the note field cause errors with JSON.parse
       data.gsub!(/[\t\x00-\x1F]/, " ") # strip control characters
-
+      
       @contacts = JSON.parse(data)['Body']['Contacts'] || {}
 
       # Determine in which format to return the data.
