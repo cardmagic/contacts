@@ -80,7 +80,7 @@ class Contacts
       # Default format.
       # ['Name', 'Email1', 'Email2', ...]
       if @contacts != nil
-        @contacts = @contacts.delete_if {|c| c["Emails"].nil?}.map do |c|
+        @contacts = @contacts.select {|c| !c["Emails"].nil?}.map do |c|
           name, emails = c.values_at "Name", "Emails"
           # emails are returned in a form of
           # [{"Address"=>"home.email@gmail.com"}, {"Type"=>{"Id"=>"WORK"}, "Address"=>"work.email@gmail.com"}]
