@@ -8,13 +8,13 @@ class YahooContactImporterTest < ContactImporterTestCase
     @account = TestAccounts[:yahoo]
   end
 
-  def test_successful_login
+  def test_a_successful_login
     Contacts.new(:yahoo, @account.username, @account.password)
   end
 
   def test_importer_fails_with_invalid_password
     assert_raise(Contacts::AuthenticationError) do
-      Contacts.new(:yahoo, @account.username,"wrong_password")
+      Contacts.new(:yahoo, @account.username, "wrong_password")
     end
     # run the "successful" login test to ensure we reset yahoo's failed login lockout counter
     # See http://www.pivotaltracker.com/story/show/138210
@@ -23,7 +23,7 @@ class YahooContactImporterTest < ContactImporterTestCase
     end
   end
 
-  def test_fetch_contacts
+  def test_a_fetch_contacts
     contacts = Contacts.new(:yahoo, @account.username, @account.password).contacts
     @account.contacts.each do |contact|
       assert contacts.include?(contact), "Could not find: #{contact.inspect} in #{contacts.inspect}"

@@ -1,14 +1,23 @@
-require 'csv'
+# Use ActiveSupport's version of JSON if available
+if Object.const_defined?('ActiveSupport') && ActiveSupport.const_defined?('JSON') && ActiveSupport::JSON.is_a?(Class)
+  class JSON
+    def self.parse(i)
+      ActiveSupport::JSON.decode(i)
+    end
+  end
+else
+  require 'json/add/rails'
+end
 
 class Contacts
   class Yahoo < Base
     URL                 = "http://mail.yahoo.com/"
     LOGIN_URL           = "https://login.yahoo.com/config/login"
-    ADDRESS_BOOK_URL    = "http://address.mail.yahoo.com/?1&VPC=import_export"
-    CONTACT_LIST_URL    = "http://address.yahoo.com/index.php?VPC=import_export&A=B&submit[action_export_yahoo]=Export%20Now"
+    ADDRESS_BOOK_URL    = "http://address.mail.yahoo.com/?.rand=430244936"
+    CONTACT_LIST_URL    = "http://address.mail.yahoo.com/?_src=&_crumb=crumb&sortfield=3&bucket=1&scroll=1&VPC=social_list&.r=time"
     PROTOCOL_ERROR      = "Yahoo has changed its protocols, please upgrade this library first. If that does not work, dive into the code and submit a patch at http://github.com/cardmagic/contacts"
     
-    def real_connect
+    def real_connect      
       postdata =  ".tries=2&.src=ym&.md5=&.hash=&.js=&.last=&promo=&.intl=us&.bypass="
       postdata += "&.partner=&.u=4eo6isd23l8r3&.v=0&.challenge=gsMsEcoZP7km3N3NeI4mX"
       postdata += "kGB7zMV&.yplus=&.emailCode=&pkg=&stepid=&.ev=&hasMsgr=1&.chkP=Y&."
@@ -48,32 +57,61 @@ class Contacts
         if resp.code_type != Net::HTTPOK
           raise ConnectionError, self.class.const_get(:PROTOCOL_ERROR)
         end
-        
-        crumb = data.to_s[/id="crumb2" value="(.*?)"/][19...-1]
+
+        crumb = data.to_s[/dotCrumb:   '(.*?)'/][13...-1]
 
         # now proceed with the new ".crumb" parameter to get the csv data
-        url = URI.parse("#{contact_list_url}&.crumb=#{crumb}")
+        url = URI.parse(contact_list_url.sub("_crumb=crumb","_crumb=#{crumb}").sub("time", Time.now.to_f.to_s.sub(".","")[0...-2]))
         http = open_http(url)
-        resp, data = http.get("#{url.path}?#{url.query}",
-          "Cookie" => @cookies
+        resp, more_data = http.get("#{url.path}?#{url.query}",
+          "Cookie" => @cookies,
+          "X-Requested-With" => "XMLHttpRequest",
+          "Referer" => address_book_url
         )
 
         if resp.code_type != Net::HTTPOK
         raise ConnectionError, self.class.const_get(:PROTOCOL_ERROR)
         end
-
+        
         parse data
+        
+        parse more_data
+        
+        if more_data =~ /"TotalABContacts":(\d+)/
+          total = $1.to_i
+          ((total / 50)).times do |i|
+            # now proceed with the new ".crumb" parameter to get the csv data
+            url = URI.parse(contact_list_url.sub("bucket=1","bucket=#{i+2}").sub("_crumb=crumb","_crumb=#{crumb}").sub("time", Time.now.to_f.to_s.sub(".","")[0...-2]))
+            http = open_http(url)
+            resp, more_data = http.get("#{url.path}?#{url.query}",
+              "Cookie" => @cookies,
+              "X-Requested-With" => "XMLHttpRequest",
+              "Referer" => address_book_url
+            )
+
+            if resp.code_type != Net::HTTPOK
+            raise ConnectionError, self.class.const_get(:PROTOCOL_ERROR)
+            end
+                        
+            parse more_data
+          end
+        end
+        
+        @contacts
       end
     end
 
   private
     
     def parse(data, options={})
-      data = CSV.parse(data)
-      col_names = data.shift
-      @contacts = data.map do |person|
-        [[person[0], person[1], person[2]].delete_if{|i|i.empty?}.join(" "), person[4]] unless person[4].empty?
-      end.compact
+      @contacts ||= []
+      if data =~ /var InitialContacts = (\[.*?\])/
+        @contacts += JSON.parse($1).select{|contact|!contact["email"].to_s.empty?}.map{|contact|[contact["contactName"], contact["email"]]}
+      elsif data =~ /^\{"response":/
+        @contacts +=  JSON.parse(data)["response"]["ResultSet"]["Contacts"].to_a.select{|contact|!contact["email"].to_s.empty?}.map{|contact|[contact["contactName"], contact["email"]]}
+      else
+        @contacts
+      end
     end
     
   end

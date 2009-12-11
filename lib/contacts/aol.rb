@@ -126,13 +126,17 @@ class Contacts
         
         data, resp, cookies, forward, old_url = get(CONTACT_LIST_CSV_URL, @cookies, CONTACT_LIST_URL) + [CONTACT_LIST_URL]
 
-        parse data
+        if forward.nil?
+          parse data
+        else
+          raise AuthenticationError, "Account cancelled"
+        end
       end
     end
   private
     
     def parse(data, options={})
-      data = CSV.parse(data)
+      data = CSV::Reader.parse(data)
       col_names = data.shift
       @contacts = data.map do |person|
         ["#{person[0]} #{person[1]}", person[4]] unless person[4].empty?

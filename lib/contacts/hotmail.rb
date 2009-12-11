@@ -27,6 +27,11 @@ class Contacts
       form_url = data.split("><").grep(/form/).first.split[5][8..-2]
       data, resp, cookies, forward = post(form_url, postdata, cookies)
       
+      old_url = form_url
+      until cookies =~ /; PPAuth=/ || forward.nil?
+        data, resp, cookies, forward, old_url = get(forward, cookies, old_url) + [forward]
+      end
+      
       if data.index("The e-mail address or password is incorrect")
         raise AuthenticationError, "Username and password do not match"
       elsif data != ""
@@ -34,13 +39,7 @@ class Contacts
       elsif cookies == ""
         raise ConnectionError, PROTOCOL_ERROR
       end
-      
-      old_url = form_url
-      
-      until forward.nil?
-        data, resp, cookies, forward, old_url = get(forward, cookies, old_url) + [forward]
-      end
-      
+            
       data, resp, cookies, forward = get("http://mail.live.com/mail", cookies)
       until forward.nil?
         data, resp, cookies, forward, old_url = get(forward, cookies, old_url) + [forward]
