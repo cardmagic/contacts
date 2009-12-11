@@ -9,6 +9,7 @@ end
 
 class Contacts
   require 'hpricot'
+  require 'csv'
   class Aol < Base
     URL                 = "http://www.aol.com/"
     LOGIN_URL           = "https://my.screenname.aol.com/_cqr/login/login.psp"
