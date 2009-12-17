@@ -1,3 +1,5 @@
+require 'json'
+
 class Contacts
   def self.parse_json( string )
     if Object.const_defined?('ActiveSupport') and
