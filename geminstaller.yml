@@ -4,3 +4,5 @@ defaults:
 gems:
   - name: json
     version: >= 1.1.1
+  - name: gdata
+    version: >= 1.1.1

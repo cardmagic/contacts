@@ -1,3 +1,5 @@
+require 'gdata'
+
 class Contacts
   class Gmail < Base
     
