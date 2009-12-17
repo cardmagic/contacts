@@ -4,7 +4,7 @@ class Contacts
   class Gmail < Base
     
     CONTACTS_SCOPE = 'http://www.google.com/m8/feeds/'
-    CONTACTS_FEED = CONTACTS_SCOPE + 'contacts/default/full/'
+    CONTACTS_FEED = CONTACTS_SCOPE + 'contacts/default/full/?max-results=1000'
     
     def contacts
       return @contacts if @contacts
