@@ -70,7 +70,7 @@ class Contacts
       data.gsub!(/\t/, ' ') # tabs in the note field cause errors with JSON.parse
       data.gsub!(/[\t\x00-\x1F]/, " ") # strip control characters
       
-      @contacts = JSON.parse(data)['Body']['Contacts'] || {}
+      @contacts = Contacts.parse_json(data)['Body']['Contacts'] || {}
 
       # Determine in which format to return the data.
       
