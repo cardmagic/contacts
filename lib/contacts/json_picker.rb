@@ -1,4 +1,6 @@
-require 'json'
+if !Object.const_defined?('ActiveSupport')
+  require 'json'
+end
 
 class Contacts
   def self.parse_json( string )
