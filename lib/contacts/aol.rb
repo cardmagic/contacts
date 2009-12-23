@@ -127,11 +127,11 @@ class Contacts
         
         data, resp, cookies, forward, old_url = get(CONTACT_LIST_CSV_URL, @cookies, CONTACT_LIST_URL) + [CONTACT_LIST_URL]
 
-        if forward.nil?
-          parse data
-        else
-          raise AuthenticationError, "Account cancelled"
+        until forward.nil?
+          data, resp, cookies, forward, old_url = get(forward, cookies, old_url) + [forward]
         end
+        
+        parse data
       end
     end
   private
