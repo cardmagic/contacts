@@ -167,14 +167,14 @@ class Contacts
     
     def uncompress(resp, data)
       case resp.response['content-encoding']
-      when 'gzip':
+      when 'gzip'
         gz = Zlib::GzipReader.new(StringIO.new(data))
         data = gz.read
         gz.close
         resp.response['content-encoding'] = nil
       # FIXME: Not sure what Hotmail was feeding me with their 'deflate',
       #        but the headers definitely were not right
-      when 'deflate':
+      when 'deflate'
         data = Zlib::Inflate.inflate(data)
         resp.response['content-encoding'] = nil
       end
