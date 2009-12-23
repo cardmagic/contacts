@@ -1,14 +1,3 @@
-# Use ActiveSupport's version of JSON if available
-if Object.const_defined?('ActiveSupport') && ActiveSupport.const_defined?('JSON') && ActiveSupport::JSON.is_a?(Class)
-  class JSON
-    def self.parse(i)
-      ActiveSupport::JSON.decode(i)
-    end
-  end
-else
-  require 'json/add/rails'
-end
-
 class Contacts
   class Yahoo < Base
     URL                 = "http://mail.yahoo.com/"
@@ -106,9 +95,9 @@ class Contacts
     def parse(data, options={})
       @contacts ||= []
       if data =~ /var InitialContacts = (\[.*?\])/
-        @contacts += JSON.parse($1).select{|contact|!contact["email"].to_s.empty?}.map{|contact|[contact["contactName"], contact["email"]]}
+        @contacts += Contacts.parse_json($1).select{|contact|!contact["email"].to_s.empty?}.map{|contact|[contact["contactName"], contact["email"]]}
       elsif data =~ /^\{"response":/
-        @contacts +=  JSON.parse(data)["response"]["ResultSet"]["Contacts"].to_a.select{|contact|!contact["email"].to_s.empty?}.map{|contact|[contact["contactName"], contact["email"]]}
+        @contacts +=  Contacts.parse_json(data)["response"]["ResultSet"]["Contacts"].to_a.select{|contact|!contact["email"].to_s.empty?}.map{|contact|[contact["contactName"], contact["email"]]}
       else
         @contacts
       end
