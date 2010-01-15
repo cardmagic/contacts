@@ -94,7 +94,7 @@ class Contacts
     
     def parse(data, options={})
       @contacts ||= []
-      if data =~ /var InitialContacts = (\[.*?\])/
+      if data =~ /var InitialContacts = (\[.*?\]);/
         @contacts += Contacts.parse_json($1).select{|contact|!contact["email"].to_s.empty?}.map{|contact|[contact["contactName"], contact["email"]]}
       elsif data =~ /^\{"response":/
         @contacts +=  Contacts.parse_json(data)["response"]["ResultSet"]["Contacts"].to_a.select{|contact|!contact["email"].to_s.empty?}.map{|contact|[contact["contactName"], contact["email"]]}
