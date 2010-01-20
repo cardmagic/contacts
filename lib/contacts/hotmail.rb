@@ -98,7 +98,7 @@ class Contacts
             c_info[2]
           end
           
-          go = resp.body.include?("Next page")
+          go = resp.body.include?("ContactList_next")
           index += 1
         end
         
