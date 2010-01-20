@@ -1,12 +1,3 @@
-class Hash
-  def to_query_string
-    u = ERB::Util.method(:u)
-    map { |k, v|
-      u.call(k) + "=" + u.call(v)
-    }.join("&")
-  end
-end
-
 class Contacts
   require 'hpricot'
   require 'csv'
@@ -53,12 +44,12 @@ class Contacts
         "redirType" => "",
         "xchk" => "false"
       }
-
+ 
       # Get this cookie and stick it in the form to confirm to Aol that your cookies work
       data, resp, cookies, forward = get(URL)
       postdata["stips"] = cookie_hash_from_string(cookies)["stips"]
       postdata["tst"] = cookie_hash_from_string(cookies)["tst"]
-
+ 
       data, resp, cookies, forward, old_url = get(LOGIN_REFERER_URL, cookies) + [URL]
       until forward.nil?
         data, resp, cookies, forward, old_url = get(forward, cookies, old_url) + [forward]
@@ -68,19 +59,19 @@ class Contacts
       until forward.nil?
         data, resp, cookies, forward, old_url = get(forward, cookies, old_url) + [forward]
       end
-
+ 
       doc = Hpricot(data)
       (doc/:input).each do |input|
         postdata["usrd"] = input.attributes["value"] if input.attributes["name"] == "usrd"
       end
       # parse data for <input name="usrd" value="2726212" type="hidden"> and add it to the postdata
-
+ 
       postdata["SNS_SC"] = cookie_hash_from_string(cookies)["SNS_SC"]
       postdata["SNS_LDC"] = cookie_hash_from_string(cookies)["SNS_LDC"]
       postdata["LTState"] = cookie_hash_from_string(cookies)["LTState"]
       # raise data.inspect
       
-      data, resp, cookies, forward, old_url = post(LOGIN_URL, postdata.to_query_string, cookies, LOGIN_REFERER_URL) + [LOGIN_REFERER_URL]
+      data, resp, cookies, forward, old_url = post(LOGIN_URL, h_to_query_string(postdata), cookies, LOGIN_REFERER_URL) + [LOGIN_REFERER_URL]
       
       until forward.nil?
         data, resp, cookies, forward, old_url = get(forward, cookies, old_url) + [forward]
@@ -97,20 +88,20 @@ class Contacts
       elsif cookies == ""
         raise ConnectionError, PROTOCOL_ERROR
       end
-
+ 
       @cookies = cookies
     end
-
+ 
     def contacts
       postdata = {
         "file" => 'contacts',
         "fileType" => 'csv'
       }
-
+ 
       return @contacts if @contacts
       if connected?
         data, resp, cookies, forward, old_url = get(CONTACT_LIST_URL, @cookies, CONTACT_LIST_URL) + [CONTACT_LIST_URL]
-
+ 
         until forward.nil?
           data, resp, cookies, forward, old_url = get(forward, cookies, old_url) + [forward]
         end
@@ -118,7 +109,7 @@ class Contacts
         if resp.code_type != Net::HTTPOK
           raise ConnectionError, self.class.const_get(:PROTOCOL_ERROR)
         end
-
+ 
         # parse data and grab <input name="user" value="8QzMPIAKs2" type="hidden">
         doc = Hpricot(data)
         (doc/:input).each do |input|
@@ -126,7 +117,7 @@ class Contacts
         end
         
         data, resp, cookies, forward, old_url = get(CONTACT_LIST_CSV_URL, @cookies, CONTACT_LIST_URL) + [CONTACT_LIST_URL]
-
+ 
         until forward.nil?
           data, resp, cookies, forward, old_url = get(forward, cookies, old_url) + [forward]
         end
@@ -147,7 +138,14 @@ class Contacts
         ["#{person[0]} #{person[1]}", person[4]] if person[4] && !person[4].empty?
       end.compact
     end    
+ 
+    def h_to_query_string(hash)
+      u = ERB::Util.method(:u)
+      hash.map { |k, v|
+        u.call(k) + "=" + u.call(v)
+      }.join("&")
+    end
   end
-
+ 
   TYPES[:aol] = Aol
 end
