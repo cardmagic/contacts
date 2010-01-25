@@ -12,7 +12,7 @@ class Contacts
     
     def real_connect
       @client = GData::Client::Contacts.new
-      @client.clientlogin(@login, @password)
+      @client.clientlogin(@login, @password, @captcha_token, @captcha_response)
       
       feed = @client.get(CONTACTS_FEED).to_xml
       

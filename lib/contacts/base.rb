@@ -12,9 +12,11 @@ class Contacts
   VERSION = "1.2.2"
   
   class Base
-    def initialize(login, password)
-      @login    = login
+    def initialize(login, password, captcha_token=nil, captcha_response=nil)
+      @login = login
       @password = password
+      @captcha_token = captcha_token
+      @captcha_response = captcha_response
       @connections = {}
       connect
     end
