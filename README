@@ -26,6 +26,12 @@ For a long time, the only way to get a list of contacts from your free online em
 
 Notice there are three ways to use this library so that you can limit the use as much as you would like in your particular application. The Contacts.guess method will automatically concatenate all the address book contacts from each of the successful logins in the case that a username password works across multiple services.
 
+== Captcha error
+
+If there are too many failed attempts with the gmail login info, Google will raise a captcha response. To integrate the captcha handling, pass in the token and response via:
+
+  Contacts::Gmail.new(login, password, :captcha_token => params[:captcha_token], :captcha_response => params[:captcha_response]).contacts
+
 == Examples
 
 See the examples/ directory.
@@ -45,6 +51,7 @@ See the examples/ directory.
 * Glenn Ford (mailto:glenn@glennfu.com) - http://www.glennfu.com/
 * Leonardo Wong (mailto:mac@boy.name)
 * Rusty Burchfield
+* justintv
 
 This library is released under the terms of the BSD.
 

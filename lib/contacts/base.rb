@@ -9,14 +9,14 @@ require "erb"
 
 class Contacts
   TYPES = {}
-  VERSION = "1.2.2"
+  VERSION = "1.2.3"
   
   class Base
-    def initialize(login, password, captcha_token=nil, captcha_response=nil)
+    def initialize(login, password, options={})
       @login = login
       @password = password
-      @captcha_token = captcha_token
-      @captcha_response = captcha_response
+      @captcha_token = options[:captcha_token]
+      @captcha_response = options[:captcha_response]
       @connections = {}
       connect
     end
