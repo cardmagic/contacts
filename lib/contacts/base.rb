@@ -197,18 +197,18 @@ class Contacts
   class TypeNotFound < ContactsError
   end
   
-  def self.new(type, login, password)
+  def self.new(type, login, password, options={})
     if TYPES.include?(type.to_s.intern)
-      TYPES[type.to_s.intern].new(login, password)
+      TYPES[type.to_s.intern].new(login, password, options)
     else
       raise TypeNotFound, "#{type.inspect} is not a valid type, please choose one of the following: #{TYPES.keys.inspect}"
     end
   end
   
-  def self.guess(login, password)
+  def self.guess(login, password, options={})
     TYPES.inject([]) do |a, t|
       begin
-        a + t[1].new(login, password).contacts
+        a + t[1].new(login, password, options).contacts
       rescue AuthenticationError
         a
       end
