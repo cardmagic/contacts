@@ -62,15 +62,11 @@ class Contacts
         raise ConnectionError, self.class.const_get(:PROTOCOL_ERROR)
         end
         
-        parse data
-        
-        parse more_data
-        
         if more_data =~ /"TotalABContacts":(\d+)/
           total = $1.to_i
-          ((total / 50)).times do |i|
+          ((total / 50.0).ceil).times do |i|
             # now proceed with the new ".crumb" parameter to get the csv data
-            url = URI.parse(contact_list_url.sub("bucket=1","bucket=#{i+2}").sub("_crumb=crumb","_crumb=#{crumb}").sub("time", Time.now.to_f.to_s.sub(".","")[0...-2]))
+            url = URI.parse(contact_list_url.sub("bucket=1","bucket=#{i}").sub("_crumb=crumb","_crumb=#{crumb}").sub("time", Time.now.to_f.to_s.sub(".","")[0...-2]))
             http = open_http(url)
             resp, more_data = http.get("#{url.path}?#{url.query}",
               "Cookie" => @cookies,
@@ -81,7 +77,7 @@ class Contacts
             if resp.code_type != Net::HTTPOK
             raise ConnectionError, self.class.const_get(:PROTOCOL_ERROR)
             end
-                        
+
             parse more_data
           end
         end
@@ -94,13 +90,11 @@ class Contacts
     
     def parse(data, options={})
       @contacts ||= []
-      if data =~ /var InitialContacts = (\[.*?\]);/
-        @contacts += Contacts.parse_json($1).select{|contact|!contact["email"].to_s.empty?}.map{|contact|[contact["contactName"], contact["email"]]}
-      elsif data =~ /^\{"response":/
-        @contacts +=  Contacts.parse_json(data)["response"]["ResultSet"]["Contacts"].to_a.select{|contact|!contact["email"].to_s.empty?}.map{|contact|[contact["contactName"], contact["email"]]}
-      else
-        @contacts
-      end
+      @contacts += Contacts.parse_json(data)["response"]["ResultSet"]["Contacts"].to_a.select{|contact|!contact["email"].to_s.empty?}.map do |contact|
+        name = contact["contactName"].split(",")
+        [[name.pop, name.join(",")].join(" "), contact["email"]]
+      end if data =~ /^\{"response":/
+      @contacts
     end
     
   end
