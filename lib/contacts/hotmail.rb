@@ -79,8 +79,7 @@ class Contacts
           email_match_text_end = Regexp.escape("&amp;")
           
           raw_html = resp.body.grep(/(?:e|dn)lk[0-9]+/)
-          raw_html.delete_at 0
-          raw_html.inject do |memo, row|
+          raw_html.inject(-1) do |memo, row|
             c_info = row.match(/(e|dn)lk([0-9])+/)
             
             # Same contact, or different?
@@ -109,6 +108,7 @@ class Contacts
             @contacts << contact
           end
         end
+        
         return @contacts
       end
     end
