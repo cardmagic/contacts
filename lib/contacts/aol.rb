@@ -13,7 +13,10 @@ class Contacts
     PROTOCOL_ERROR      = "AOL has changed its protocols, please upgrade this library first. If that does not work, dive into the code and submit a patch at http://github.com/cardmagic/contacts"
     
     def real_connect
-      
+      if login.strip =~ /^(.+)@aol\.com$/ # strip off the @aol.com for AOL logins
+        login = $1
+      end
+
       postdata = {
         "loginId" => login,
         "password" => password,

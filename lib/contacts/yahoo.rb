@@ -92,7 +92,7 @@ class Contacts
       @contacts ||= []
       @contacts += Contacts.parse_json(data)["response"]["ResultSet"]["Contacts"].to_a.select{|contact|!contact["email"].to_s.empty?}.map do |contact|
         name = contact["contactName"].split(",")
-        [[name.pop, name.join(",")].join(" "), contact["email"]]
+        [[name.pop, name.join(",")].join(" ").strip, contact["email"]]
       end if data =~ /^\{"response":/
       @contacts
     end
