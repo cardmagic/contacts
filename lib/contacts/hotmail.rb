@@ -78,7 +78,8 @@ class Contacts
           email_match_text_beginning = Regexp.escape("http://m.mail.live.com/?rru=compose&amp;to=")
           email_match_text_end = Regexp.escape("&amp;")
           
-          raw_html = resp.body.grep(/(?:e|dn)lk[0-9]+/)
+          raw_html = resp.body.split("
+").grep(/(?:e|dn)lk[0-9]+/)
           raw_html.inject(-1) do |memo, row|
             c_info = row.match(/(e|dn)lk([0-9])+/)
             
