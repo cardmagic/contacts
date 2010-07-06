@@ -2,6 +2,7 @@ dir = File.dirname(__FILE__)
 $LOAD_PATH.unshift(dir + "/../lib/")
 require 'test/unit'
 require 'contacts'
+require 'yaml'
 
 class ContactImporterTestCase < Test::Unit::TestCase
   # Add more helper methods to be used by all tests here...

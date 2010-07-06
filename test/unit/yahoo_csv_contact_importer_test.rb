@@ -18,6 +18,9 @@ class YahooContactImporterTest < ContactImporterTestCase
     end
     # run the "successful" login test to ensure we reset yahoo's failed login lockout counter
     # See http://www.pivotaltracker.com/story/show/138210
+    # yahoo needs some time to unset the failed login state, apparently... 
+    # ...1 sec and 5 secs still failed sporadically
+    sleep 10
     assert_nothing_raised do
       Contacts.new(:yahoo, @account.username, @account.password)
     end
