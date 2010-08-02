@@ -65,6 +65,10 @@ class Contacts
     def password
       @password
     end
+
+    def skip_gzip?
+      false
+    end
     
   private
   
@@ -132,13 +136,14 @@ class Contacts
     def post(url, postdata, cookies="", referer="")
       url = URI.parse(url)
       http = open_http(url)
-      resp, data = http.post(url.path, postdata,
-        "User-Agent" => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en-US; rv:1.8.1) Gecko/20061010 Firefox/2.0",
+      http_header = { "User-Agent" => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en-US; rv:1.8.1) Gecko/20061010 Firefox/2.0",
         "Accept-Encoding" => "gzip",
         "Cookie" => cookies,
         "Referer" => referer,
         "Content-Type" => 'application/x-www-form-urlencoded'
-      )
+      }
+      http_header.reject!{|k, v| k == 'Accept-Encoding'} if skip_gzip?
+      resp, data = http.post(url.path, postdata, http_header)
       data = uncompress(resp, data)
       cookies = parse_cookies(resp.response['set-cookie'], cookies)
       forward = resp.response['Location']
