@@ -62,6 +62,8 @@ class Contacts
         raise ConnectionError, self.class.const_get(:PROTOCOL_ERROR)
         end
         
+        @contacts ||= []
+        
         if more_data =~ /"TotalABContacts":(\d+)/
           total = $1.to_i
           ((total / 50.0).ceil).times do |i|
