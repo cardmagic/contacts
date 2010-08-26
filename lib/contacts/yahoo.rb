@@ -5,15 +5,15 @@ class Contacts
     ADDRESS_BOOK_URL    = "http://address.mail.yahoo.com/?.rand=430244936"
     CONTACT_LIST_URL    = "http://address.mail.yahoo.com/?_src=&_crumb=crumb&sortfield=3&bucket=1&scroll=1&VPC=social_list&.r=time"
     PROTOCOL_ERROR      = "Yahoo has changed its protocols, please upgrade this library first. If that does not work, dive into the code and submit a patch at http://github.com/cardmagic/contacts"
-    
-    def real_connect      
+
+    def real_connect
       postdata =  ".tries=2&.src=ym&.md5=&.hash=&.js=&.last=&promo=&.intl=us&.bypass="
       postdata += "&.partner=&.u=4eo6isd23l8r3&.v=0&.challenge=gsMsEcoZP7km3N3NeI4mX"
       postdata += "kGB7zMV&.yplus=&.emailCode=&pkg=&stepid=&.ev=&hasMsgr=1&.chkP=Y&."
       postdata += "done=#{CGI.escape(URL)}&login=#{CGI.escape(login)}&passwd=#{CGI.escape(password)}"
-      
+
       data, resp, cookies, forward = post(LOGIN_URL, postdata)
-      
+
       if data.index("Invalid ID or password") || data.index("This ID is not yet taken")
         raise AuthenticationError, "Username and password do not match"
       elsif data.index("Sign in") && data.index("to Yahoo!")
@@ -23,18 +23,20 @@ class Contacts
       elsif cookies == ""
         raise ConnectionError, PROTOCOL_ERROR
       end
-      
+
       data, resp, cookies, forward = get(forward, cookies, LOGIN_URL)
-      
+
       if resp.code_type != Net::HTTPOK
         raise ConnectionError, PROTOCOL_ERROR
       end
-      
+
       @cookies = cookies
     end
-    
-    def contacts       
+
+    def contacts
       return @contacts if @contacts
+      @contacts = []
+
       if connected?
         # first, get the addressbook site with the new crumb parameter
         url = URI.parse(address_book_url)
@@ -61,7 +63,7 @@ class Contacts
         if resp.code_type != Net::HTTPOK
         raise ConnectionError, self.class.const_get(:PROTOCOL_ERROR)
         end
-        
+
         if more_data =~ /"TotalABContacts":(\d+)/
           total = $1.to_i
           ((total / 50.0).ceil).times do |i|
@@ -81,13 +83,13 @@ class Contacts
             parse more_data
           end
         end
-        
+
         @contacts
       end
     end
 
   private
-    
+
     def parse(data, options={})
       @contacts ||= []
       @contacts += Contacts.parse_json(data)["response"]["ResultSet"]["Contacts"].to_a.select{|contact|!contact["email"].to_s.empty?}.map do |contact|
@@ -96,7 +98,7 @@ class Contacts
       end if data =~ /^\{"response":/
       @contacts
     end
-    
+
   end
 
   TYPES[:yahoo] = Yahoo
