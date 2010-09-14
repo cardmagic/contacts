@@ -89,7 +89,7 @@ class Contacts
             # Grab info
             case c_info[1]
               when "e" # Email
-                build_contacts.last[1] = row.match(/#{email_match_text_beginning}(.*)#{email_match_text_end}/)[1]
+                build_contacts.last[1] = row.match(/#{email_match_text_beginning}(.*?)#{email_match_text_end}/)[1]
               when "dn" # Name
                 build_contacts.last[0] = row.match(/<a[^>]*>(.+)<\/a>/)[1]
             end
@@ -105,7 +105,9 @@ class Contacts
         build_contacts.each do |contact|
           unless contact[1].nil?
             # Only return contacts with email addresses
-            contact[1] = CGI::unescape(contact[1])
+            while contact[1] =~ /((%[0-9a-fA-F]{2})+)/i do
+              contact[1] = CGI::unescape(contact[1])
+            end
             @contacts << contact
           end
         end
