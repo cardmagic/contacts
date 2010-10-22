@@ -18,7 +18,7 @@ class Contacts
       end
       
       @customerno = forward.match(/CUSTOMERNO=(\d+)/)[1]
-      @t = forward.match(/t=([^&]+)&/)[1]
+      @t = forward.match(/t=([^&]+)/)[1]
     end
     
     def contacts      
