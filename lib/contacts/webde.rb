@@ -1,3 +1,5 @@
+require "iconv"
+
 class Contacts
   class Webde < Base
     LOGIN_URL = "https://login.web.de/intern/login/"
@@ -32,11 +34,11 @@ class Contacts
     end
 
     def contacts
-      conect_to_addressbook
+      connect_to_addressbook
       @contacts = []
       if @sessionid
         CSV.parse(get_entries_from_addressbook) do |row|
-          @contacts << ["#{row[2]} #{row[0]}", row[9]] unless header_row?(row)
+          @contacts << [latin1_to_utf8("#{row[2]} #{row[0]}"), latin1_to_utf8(row[9])] unless header_row?(row)
         end
       end
       
@@ -44,12 +46,16 @@ class Contacts
     end
 
     private
+   
+    def latin1_to_utf8(string)
+      Iconv.conv("utf-8", "ISO-8859-1", string)
+    end
     
     def header_row?(row)
       row[0] == 'Nachname'
     end
 
-    def conect_to_addressbook
+    def connect_to_addressbook
       data, resp, cookies, forward = get JUMP_URL + "?serviceID=comsaddressbook-live.webde&session=#{@si}&server=https://freemailng2901.web.de&partnerdata="
       @sessionid = forward.match(/session=([^&]+)/)[1]
     end
