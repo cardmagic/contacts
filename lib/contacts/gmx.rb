@@ -36,7 +36,7 @@ class Contacts
     private
  
     def scan_contacts(html)
-      html.scan(/"\"?([\w\.\s-]+)\"?\s&lt;([\w\.-]+@[\w\.-]+\.\w+)&gt;"/) do |match|
+      html.scan(/"\"?([\w\.\s-]+)\"?\s&lt;([\w\.-]+@[\w\.-]+\.\w+)(?:&gt;)?"/) do |match|
         @contacts[match[0]] = match[1]
       end
     end
