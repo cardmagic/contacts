@@ -1,5 +1,5 @@
 class Contacts
-  require 'hpricot'
+  require 'nokogiri'
   require 'csv'
   class Aol < Base
     URL                 = "http://www.aol.com/"
@@ -62,14 +62,14 @@ class Contacts
       until forward.nil?
         data, resp, cookies, forward, old_url = get(forward, cookies, old_url) + [forward]
       end
+
+      # parse data for <input name="usrd" value="2726212" type="hidden"> and add it to the postdata 
+      doc   = Nokogiri::HTML(data)
+      input = doc.css('input[name="usrd"]').first
+      postdata["usrd"] = input[:value] if input
+
  
-      doc = Hpricot(data)
-      (doc/:input).each do |input|
-        postdata["usrd"] = input.attributes["value"] if input.attributes["name"] == "usrd"
-      end
-      # parse data for <input name="usrd" value="2726212" type="hidden"> and add it to the postdata
- 
-      postdata["SNS_SC"] = cookie_hash_from_string(cookies)["SNS_SC"]
+      postdata["SNS_SC"]  = cookie_hash_from_string(cookies)["SNS_SC"]
       postdata["SNS_LDC"] = cookie_hash_from_string(cookies)["SNS_LDC"]
       postdata["LTState"] = cookie_hash_from_string(cookies)["LTState"]
       # raise data.inspect
@@ -114,10 +114,9 @@ class Contacts
         end
  
         # parse data and grab <input name="user" value="8QzMPIAKs2" type="hidden">
-        doc = Hpricot(data)
-        (doc/:input).each do |input|
-          postdata["user"] = input.attributes["value"] if input.attributes["name"] == "user"
-        end
+        doc   = Nokogiri::HTML(data)
+        input = doc.css('input[name="user"]').first
+        postdata["user"] = input[:value] if input
         
         data, resp, cookies, forward, old_url = get(CONTACT_LIST_CSV_URL, @cookies, CONTACT_LIST_URL) + [CONTACT_LIST_URL]
  
