@@ -80,7 +80,7 @@ class Contacts
         data, resp, cookies, forward, old_url = get(forward, cookies, old_url) + [forward]
       end
       
-      if data.index("Invalid Username or Password. Please try again.")
+      if data.index("Incorrect Username or Password.")
         raise AuthenticationError, "Username and password do not match"
       elsif data.index("Required field must not be blank")
         raise AuthenticationError, "Login and password must not be blank"
