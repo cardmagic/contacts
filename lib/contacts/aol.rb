@@ -135,11 +135,19 @@ class Contacts
   private
     
     def parse(data, options={})
-      data = CSV::Reader.parse(data)
-      col_names = data.shift
-      @contacts = data.map do |person|
-        ["#{person[0]} #{person[1]}", person[4]] if person[4] && !person[4].empty?
-      end.compact
+      begin
+        @contacts = []
+        FasterCSV.parse(data) do |person|
+          @contacts << ["#{person[0]} #{person[1]}", person[4]] if person[4] && !person[4].empty?
+        end
+        @contacts
+      rescue
+        parsed_data = CSV::Reader.parse(data)
+        col_names = parsed_data.shift
+        @contacts = parsed_data.map do |person|
+          ["#{person[0]} #{person[1]}", person[4]] if person[4] && !person[4].empty?
+        end.compact
+      end
     end    
  
     def h_to_query_string(hash)
