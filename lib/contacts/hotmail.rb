@@ -9,7 +9,7 @@ class Contacts
     PWDPAD = "IfYouAreReadingThisYouHaveTooMuchFreeTime"
     MAX_HTTP_THREADS    = 8
     
-    def real_connect_data
+    def real_connect_debug
       data, resp, cookies, forward = get(URL)
       old_url = URL
       until forward.nil?
@@ -32,7 +32,29 @@ class Contacts
         data, resp, cookies, forward, old_url = get(forward, cookies, old_url) + [forward]
       end
       data
+
+      if data.index("The e-mail address or password is incorrect")
+        raise AuthenticationError, "Username and password do not match"
+      elsif cookies == ""
+        raise ConnectionError, PROTOCOL_ERROR
+      end
+      
+      data, resp, cookies, forward = get("http://mail.live.com/mail", cookies)
+      until forward.nil?
+        data, resp, cookies, forward, old_url = get(forward, cookies, old_url) + [forward]
+      end
+      
+      
+      @domain = URI.parse(old_url).host
+      @cookies = cookies
+    rescue AuthenticationError => m
+      if @attempt == 1
+        retry
+      else
+        raise m
+      end
     end
+  end
 
     def real_connect
       data, resp, cookies, forward = get(URL)
