@@ -102,6 +102,13 @@ class Contacts
       end
     end
     
+    def debug_contacts
+      if connected?
+        url = URI.parse(contact_list_url)
+        data, resp, cookies, forward = get( contact_list_url, @cookies )
+      end
+    end
+
     def contacts(options = {})
       if connected?
         url = URI.parse(contact_list_url)
