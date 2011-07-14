@@ -18,7 +18,7 @@ class Contacts
       @captcha_token = options[:captcha_token]
       @captcha_response = options[:captcha_response]
       @connections = {}
-      connect
+      #connect
     end
     
     def connect
