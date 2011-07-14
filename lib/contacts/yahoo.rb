@@ -68,7 +68,7 @@ class Contacts
           raise ConnectionError, self.class.const_get(:PROTOCOL_ERROR)
         end
         
-        data, more_data
+        [data, more_data]
       end
 
     def contacts       
