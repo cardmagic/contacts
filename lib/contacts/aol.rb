@@ -183,9 +183,16 @@ class Contacts
         end
       end
       col_names = data.shift
-      @contacts = data.map do |person|
-        ["#{person[0]} #{person[1]}", person[4]] if person[4] && !person[4].empty?
-      end.compact
+      @contacts = []
+      data.each do |person|
+        if person[4] && !person[4].empty? && person[5] && !person[5].empty?
+          @contacts << ["#{person[0]} #{person[1]}", person[4]]
+        end
+        if person[5] && !person[5].empty?
+          @contacts <<  ["#{person[0]} #{person[1]}", person[5]]  
+        end
+      end
+      @contacts
     end    
  
     def h_to_query_string(hash)
