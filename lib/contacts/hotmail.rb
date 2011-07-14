@@ -54,8 +54,7 @@ class Contacts
         raise m
       end
     end
-  end
-
+  
     def real_connect
       data, resp, cookies, forward = get(URL)
       old_url = URL
