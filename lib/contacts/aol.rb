@@ -132,6 +132,45 @@ class Contacts
         parse data
       end
     end
+    
+    def contacts_data
+      postdata = {
+        "file" => 'contacts',
+        "fileType" => 'csv'
+      }
+ 
+      return @contacts if @contacts
+      if connected?
+        data, resp, cookies, forward, old_url = get(CONTACT_LIST_URL, @cookies, CONTACT_LIST_URL) + [CONTACT_LIST_URL]
+ 
+        until forward.nil?
+          data, resp, cookies, forward, old_url = get(forward, cookies, old_url) + [forward]
+        end
+        
+        if resp.code_type != Net::HTTPOK
+          raise ConnectionError, self.class.const_get(:PROTOCOL_ERROR)
+        end
+ 
+        # parse data and grab <input name="user" value="8QzMPIAKs2" type="hidden">
+        doc = Hpricot(data)
+        (doc/:input).each do |input|
+          postdata["user"] = input.attributes["value"] if input.attributes["name"] == "user"
+        end
+        
+        data, resp, cookies, forward, old_url = get(CONTACT_LIST_CSV_URL, @cookies, CONTACT_LIST_URL) + [CONTACT_LIST_URL]
+ 
+        until forward.nil?
+          data, resp, cookies, forward, old_url = get(forward, cookies, old_url) + [forward]
+        end
+        
+        if data.include?("error.gif")
+          raise AuthenticationError, "Account invalid"
+        end
+        
+        data
+      end
+    end
+    
   private
     
     def parse(data, options={})
