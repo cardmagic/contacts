@@ -138,7 +138,11 @@ class Contacts
       if CSV.const_defined? :Reader
         data = CSV::Reader.parse(data)
       else
-        data = CSV.parse(data)
+        if data.is_a?(String)
+          data = CSV.parse(data)
+        else
+          data = CSV.read(data)
+        end
       end
       col_names = data.shift
       @contacts = data.map do |person|
