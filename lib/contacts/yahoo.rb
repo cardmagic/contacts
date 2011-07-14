@@ -124,8 +124,8 @@ class Contacts
             parse more_data
           end
         end
-        
-        @contacts
+        # eliminate dupe emails
+        @contacts = @contacts.uniq {|a,b| b}
       end
     end
 
