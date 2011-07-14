@@ -139,9 +139,8 @@ class Contacts
         "fileType" => 'csv'
       }
  
-      return @contacts if @contacts
       if connected?
-        data, resp, cookies, forward, old_url = get(CONTACT_LIST_URL, @cookies, CONTACT_LIST_URL) + [CONTACT_LIST_URL]
+        data, resp, cookies, forward, old_url = get(@contact_list_url, @cookies, @contact_list_url) + [@contact_list_url]
  
         until forward.nil?
           data, resp, cookies, forward, old_url = get(forward, cookies, old_url) + [forward]
@@ -157,7 +156,7 @@ class Contacts
           postdata["user"] = input.attributes["value"] if input.attributes["name"] == "user"
         end
         
-        data, resp, cookies, forward, old_url = get(CONTACT_LIST_CSV_URL, @cookies, CONTACT_LIST_URL) + [CONTACT_LIST_URL]
+        data, resp, cookies, forward, old_url = get(@contact_list_csv_url, @cookies, @contact_list_url) + [@contact_list_url]
  
         until forward.nil?
           data, resp, cookies, forward, old_url = get(forward, cookies, old_url) + [forward]
