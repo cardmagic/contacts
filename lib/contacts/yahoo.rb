@@ -70,7 +70,8 @@ class Contacts
         
         [data, more_data]
       end
-
+    end
+    
     def contacts       
       return @contacts if @contacts
       if connected?
