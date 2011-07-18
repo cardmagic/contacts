@@ -51,14 +51,16 @@ class Contacts
           elsif cont.elements['displayName']
             cont.elements['displayName'].text
           end
-          email = if cont.elements['email1']
-            cont.elements['email1'].text
+          i = 1
+          emails = []
+          while (cont.elements["email#{i}"] || cont.elements["workEmail#{i}"])
+            emails << cont.elements["email#{i}"].text if cont.elements["email#{i}"]
+            emails <<  cont.elements["workEmail#{i}"].text if cont.elements["workEmail#{i}"]
+            i += 1
           end
-          if name || email
-            @contacts << [name, email]
-          end
+          emails.each {|email| @contacts << [name, email] }
         end
-        @contacts
+        @contacts.uniq {|a,b| b}
       else
         raise ConnectionError, PROTOCOL_ERROR
       end
