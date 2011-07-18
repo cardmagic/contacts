@@ -24,6 +24,18 @@ class Contacts
       parse data
     end # contacts
     
+    def contacts_data
+      getdata = "&authInfo.authByEmail.email=%s" % CGI.escape(login)
+      getdata += "&authInfo.authByEmail.password=%s" % CGI.escape(password)
+      data, resp, cookies, forward = get(CONTACT_LIST_URL + getdata)
+      
+      if resp.code_type != Net::HTTPOK
+        raise ConnectionError, PROTOCOL_ERROR
+      end
+
+      data
+    end
+
   private
     def parse(data, options={})
       doc = REXML::Document.new(data)
