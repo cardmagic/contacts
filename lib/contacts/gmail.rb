@@ -19,7 +19,7 @@ class Contacts
       @contacts = feed.elements.to_a('entry').collect do |entry|
         title, email = entry.elements['title'].text, nil
         entry.elements.each('gd:email') do |e|
-          email = e.attribute('address').value if e.attribute('primary')
+          email = e.attribute('address').value
         end
         [title, email] unless email.nil?
       end
