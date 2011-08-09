@@ -69,7 +69,7 @@ class Contacts
           more_data =~ /"TotalContacts":(\d+)/
           total_contacts_per_page = $1.to_i
           
-          ((total / 50.0).ceil).times do |i|
+          ((total / total_contacts_per_page.to_f).ceil).times do |i|
             # now proceed with the new ".crumb" parameter to get the csv data
             url = URI.parse(contact_list_url.sub("bucket=1","bucket=#{i}").sub("_crumb=crumb","_crumb=#{crumb}").sub("time", Time.now.to_f.to_s.sub(".","")[0...-2]))
             http = open_http(url)
