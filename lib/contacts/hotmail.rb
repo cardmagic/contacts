@@ -57,13 +57,6 @@ class Contacts
     
     def contacts(options = {})
       if connected?
-        url = URI.parse(contact_list_url)
-        data, resp, cookies, forward = get( contact_list_url, @cookies )
-        
-        if resp.code_type != Net::HTTPOK
-          raise ConnectionError, self.class.const_get(:PROTOCOL_ERROR)
-        end
-        
         @contacts = []
         build_contacts = []
         go = true
@@ -71,10 +64,9 @@ class Contacts
         
         while(go) do
           go = false
-          url = URI.parse(get_contact_list_url(index))
-          http = open_http(url)
-          resp, data = http.get(get_contact_list_url(index), "Cookie" => @cookies)
           
+          data, resp, cookies, forward = get( get_contact_list_url(index), @cookies )
+
           email_match_text_beginning = Regexp.escape("http://m.mail.live.com/?rru=compose&amp;to=")
           email_match_text_end = Regexp.escape("&amp;")
           
