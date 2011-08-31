@@ -62,7 +62,7 @@ spec = Gem::Specification.new do |s|
   s.autorequire = 'contacts'
 
   s.add_dependency('json', '>= 0.4.1')
-  s.add_dependency('gdata', '= 1.1.1')
+  s.add_dependency('gdata', '>= 1.1.1')
   s.requirements << "A json parser, the gdata ruby gem"
 
   #### Documentation and testing.
