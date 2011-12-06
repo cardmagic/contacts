@@ -61,26 +61,31 @@ class Contacts
         )
 
         if resp.code_type != Net::HTTPOK
-        raise ConnectionError, self.class.const_get(:PROTOCOL_ERROR)
+          raise ConnectionError, self.class.const_get(:PROTOCOL_ERROR)
         end
 
         if more_data =~ /"TotalABContacts":(\d+)/
           total = $1.to_i
-          ((total / 50.0).ceil).times do |i|
-            # now proceed with the new ".crumb" parameter to get the csv data
-            url = URI.parse(contact_list_url.sub("bucket=1","bucket=#{i}").sub("_crumb=crumb","_crumb=#{crumb}").sub("time", Time.now.to_f.to_s.sub(".","")[0...-2]))
-            http = open_http(url)
-            resp, more_data = http.get("#{url.path}?#{url.query}",
-              "Cookie" => @cookies,
-              "X-Requested-With" => "XMLHttpRequest",
-              "Referer" => address_book_url
-            )
+          if total > 0
+            more_data =~ /"TotalContacts":(\d+)/
+            total_contacts_per_page = $1.to_i
 
-            if resp.code_type != Net::HTTPOK
-            raise ConnectionError, self.class.const_get(:PROTOCOL_ERROR)
+            ((total / total_contacts_per_page.to_f).ceil).times do |i|
+              # now proceed with the new ".crumb" parameter to get the csv data
+              url = URI.parse(contact_list_url.sub("bucket=1","bucket=#{i}").sub("_crumb=crumb","_crumb=#{crumb}").sub("time", Time.now.to_f.to_s.sub(".","")[0...-2]))
+              http = open_http(url)
+              resp, more_data = http.get("#{url.path}?#{url.query}",
+                "Cookie" => @cookies,
+                "X-Requested-With" => "XMLHttpRequest",
+                "Referer" => address_book_url
+              )
+
+              if resp.code_type != Net::HTTPOK
+                raise ConnectionError, self.class.const_get(:PROTOCOL_ERROR)
+              end
+
+              parse more_data
             end
-
-            parse more_data
           end
         end
 
