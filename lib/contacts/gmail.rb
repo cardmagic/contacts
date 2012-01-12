@@ -1,4 +1,5 @@
 require 'gdata'
+require 'nokogiri'
 
 class Contacts
   class Gmail < Base
