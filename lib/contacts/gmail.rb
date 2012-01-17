@@ -19,10 +19,15 @@ class Contacts
 
       @contacts = feed.root.elements.select {|n| n.name == 'entry' }.map do |node|
         children = node.children
-        name = children.search('title').text
         email = children.last.attr('address')
 
-        [name, email] unless name.empty? || email.empty?
+        if email.nil? || email.empty?
+          nil
+        else
+          name = children.search('title').text
+          name = guess_name(email) if name.nil? || name.empty?
+          [name, email]
+        end
       end.compact
     rescue GData::Client::AuthorizationError => e
       raise AuthenticationError, "Username or password are incorrect"

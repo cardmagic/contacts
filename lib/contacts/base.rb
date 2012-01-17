@@ -10,7 +10,7 @@ require "erb"
 class Contacts
   TYPES = {}
   VERSION = "1.2.4"
-  
+
   class Base
     def initialize(login, password, options={})
       @login = login
@@ -20,12 +20,12 @@ class Contacts
       @connections = {}
       connect
     end
-    
+
     def connect
       raise AuthenticationError, "Login and password must not be nil, login: #{@login.inspect}, password: #{@password.inspect}" if @login.nil? || @login.empty? || @password.nil? || @password.empty?
       real_connect
     end
-    
+
     def connected?
       @cookies && !@cookies.empty?
     end
@@ -38,19 +38,19 @@ class Contacts
         resp, data = http.get("#{url.path}?#{url.query}",
           "Cookie" => @cookies
         )
-        
+
         if resp.code_type != Net::HTTPOK
           raise ConnectionError, self.class.const_get(:PROTOCOL_ERROR)
         end
-        
+
         parse(data, options)
       end
     end
-    
+
     def login
       @attempt ||= 0
       @attempt += 1
-            
+
       if @attempt == 1
         @login
       else
@@ -61,7 +61,7 @@ class Contacts
         end
       end
     end
-    
+
     def password
       @password
     end
@@ -69,9 +69,13 @@ class Contacts
     def skip_gzip?
       false
     end
-    
+
   private
-  
+
+    def guess_name(email)
+      email.split('@').first
+    end
+
     def domain
       @d ||= URI.parse(self.class.const_get(:URL)).host.sub(/^www\./,'')
     end
@@ -98,16 +102,16 @@ class Contacts
       http.start unless http.started?
       http
     end
-    
+
     def cookie_hash_from_string(cookie_string)
       cookie_string.split(";").map{|i|i.split("=", 2).map{|j|j.strip}}.inject({}){|h,i|h[i[0]]=i[1];h}
     end
-    
+
     def parse_cookies(data, existing="")
       return existing if data.nil?
 
       cookies = cookie_hash_from_string(existing)
-      
+
       data.gsub!(/ ?[\w]+=EXPIRED;/,'')
       data.gsub!(/ ?expires=(.*?, .*?)[;,$]/i, ';')
       data.gsub!(/ ?(domain|path)=[\S]*?[;,$]/i,';')
@@ -116,7 +120,7 @@ class Contacts
       data.gsub!(/(,\s*){2,}/,', ')
       data.sub!(/^,\s*/,'')
       data.sub!(/\s*,$/,'')
-      
+
       data.split(", ").map{|t|t.to_s.split(";").first}.each do |data|
         k, v = data.split("=", 2).map{|j|j.strip}
         if cookies[k] && v.empty?
@@ -125,14 +129,14 @@ class Contacts
           cookies[k] = v
         end
       end
-      
+
       cookies.map{|k,v| "#{k}=#{v}"}.join("; ")
     end
-    
+
     def remove_cookie(cookie, cookies)
       parse_cookies("#{cookie}=", cookies)
     end
-    
+
     def post(url, postdata, cookies="", referer="")
       url = URI.parse(url)
       http = open_http(url)
@@ -153,7 +157,7 @@ class Contacts
 	end
       return data, resp, cookies, forward
     end
-    
+
     def get(url, cookies="", referer="")
       url = URI.parse(url)
       http = open_http(url)
@@ -171,7 +175,7 @@ class Contacts
 	  end
       return data, resp, cookies, forward
     end
-    
+
     def uncompress(resp, data)
       case resp.response['content-encoding']
       when 'gzip'
@@ -189,19 +193,19 @@ class Contacts
       data
     end
   end
-  
+
   class ContactsError < StandardError
   end
-  
+
   class AuthenticationError < ContactsError
   end
 
   class ConnectionError < ContactsError
   end
-  
+
   class TypeNotFound < ContactsError
   end
-  
+
   def self.new(type, login, password, options={})
     if TYPES.include?(type.to_s.intern)
       TYPES[type.to_s.intern].new(login, password, options)
@@ -209,7 +213,7 @@ class Contacts
       raise TypeNotFound, "#{type.inspect} is not a valid type, please choose one of the following: #{TYPES.keys.inspect}"
     end
   end
-  
+
   def self.guess(login, password, options={})
     TYPES.inject([]) do |a, t|
       begin
