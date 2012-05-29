@@ -89,7 +89,7 @@ class Contacts
             # Grab info
             case c_info[1]
               when "e" # Email
-                build_contacts.last[1] = row.match(/#{email_match_text_beginning}(.*)#{email_match_text_end}/)[1]
+                build_contacts.last[1] = CGI.unescape(row.match(/#{email_match_text_beginning}([^&]*)#{email_match_text_end}/)[1])
               when "dn" # Name
                 build_contacts.last[0] = row.match(/<a[^>]*>(.+)<\/a>/)[1]
             end
