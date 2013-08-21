@@ -1,10 +1,11 @@
 require 'rubygems'
+require 'bundler/setup'
 require 'rake'
 require 'rake/testtask'
 require 'rake/rdoctask'
 require 'rake/gempackagetask'
 require 'rake/contrib/rubyforgepublisher'
-require 'lib/contacts'
+require './lib/contacts'
 
 PKG_VERSION = Contacts::VERSION
 
