@@ -1,6 +1,7 @@
 $:.unshift(File.dirname(__FILE__)+"/contacts/")
 
 require 'rubygems'
+require 'bundler/setup'
 
 require 'base'
 require 'json_picker'
