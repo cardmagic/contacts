@@ -39,7 +39,9 @@ If there are too many failed attempts with the gmail login info, Google will rai
 <pre><code>
   Contacts::Gmail.new(login, password, :captcha_token => params[:captcha_token], :captcha_response => params[:captcha_response]).contacts
 </code></pre>
-h2. Examples
+
+Examples
+--------
 
 See the examples/ directory.
 
