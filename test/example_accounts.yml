@@ -1,7 +1,7 @@
 gmail:
   username: <changeme>
   password: <changeme>
-  contacts: 
+  contacts:
     -
       name: "FirstName1 LastName1"
       email_address: "firstname1@example.com"
@@ -11,7 +11,7 @@ gmail:
 yahoo:
   username: <changeme>
   password: <changeme>
-  contacts: 
+  contacts:
     -
       name: "FirstName1 LastName1"
       email_address: "firstname1@example.com"
@@ -21,7 +21,7 @@ yahoo:
 hotmail:
   username: <changeme>
   password: <changeme>
-  contacts: 
+  contacts:
     -
       name: "FirstName1 LastName1"
       email_address: "firstname1@example.com"
@@ -31,7 +31,7 @@ hotmail:
 aol:
   username: <changeme>
   password: <changeme>
-  contacts: 
+  contacts:
     -
       name: "FirstName1 LastName1"
       email_address: "firstname1@example.com"
