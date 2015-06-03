@@ -100,6 +100,4 @@ class Contacts
     end
 
   end
-
-  TYPES[:yahoo] = Yahoo
 end
