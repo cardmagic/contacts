@@ -45,6 +45,7 @@ class Contacts
         data, resp, cookies, forward, old_url = get(forward, cookies, old_url) + [forward]
       end
       
+      
       @domain = URI.parse(old_url).host
       @cookies = cookies
     rescue AuthenticationError => m
@@ -68,7 +69,7 @@ class Contacts
           data, resp, cookies, forward = get( get_contact_list_url(index), @cookies )
 
           email_match_text_beginning = Regexp.escape("http://m.mail.live.com/?rru=compose&amp;to=")
-          email_match_text_end = Regexp.escape("&amp;")
+          email_match_text_end = Regexp.escape("&amp;ru=")
           
           raw_html = resp.body.split("
 ").grep(/(?:e|dn)lk[0-9]+/)
@@ -97,7 +98,7 @@ class Contacts
         build_contacts.each do |contact|
           unless contact[1].nil?
             # Only return contacts with email addresses
-            contact[1] = CGI::unescape(contact[1])
+            contact[1] = CGI::unescape CGI::unescape(contact[1])
             @contacts << contact
           end
         end
