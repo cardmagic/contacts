@@ -156,13 +156,19 @@ class Contacts
     
     def get(url, cookies="", referer="")
       url = URI.parse(url)
-      http = open_http(url)
-      resp, data = http.get("#{url.path}?#{url.query}",
-        "User-Agent" => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en-US; rv:1.8.1) Gecko/20061010 Firefox/2.0",
-        "Accept-Encoding" => "gzip",
-        "Cookie" => cookies,
-        "Referer" => referer
-      )
+      attempt = 0
+      begin
+        http = open_http(url)
+        resp, data = http.get("#{url.path}?#{url.query}",
+          "User-Agent" => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en-US; rv:1.8.1) Gecko/20061010 Firefox/2.0",
+          "Accept-Encoding" => "gzip",
+          "Cookie" => cookies,
+          "Referer" => referer
+        )
+      rescue EOFError => err
+        attempt += 1
+        retry if attempt == 1
+      end
       data = uncompress(resp, data)
       cookies = parse_cookies(resp.response['set-cookie'], cookies)
       forward = resp.response['Location']
