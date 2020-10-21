@@ -4,7 +4,7 @@ GEM
     diff-lcs (1.2.4)
     gdata_19 (1.1.5)
     hpricot (0.8.6)
-    json (1.8.0)
+    json (2.3.0)
     rake (0.9.2.2)
     rspec (2.14.1)
       rspec-core (~> 2.14.0)
