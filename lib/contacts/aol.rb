@@ -6,10 +6,6 @@ class Contacts
     LOGIN_URL           = "https://my.screenname.aol.com/_cqr/login/login.psp"
     LOGIN_REFERER_URL   = "http://webmail.aol.com/"
     LOGIN_REFERER_PATH = "sitedomain=sns.webmail.aol.com&lang=en&locale=us&authLev=0&uitype=mini&loginId=&redirType=js&xchk=false"
-    AOL_NUM = "29970-343" # this seems to change each time they change the protocol
-    
-    CONTACT_LIST_URL    = "http://webmail.aol.com/#{AOL_NUM}/aim-2/en-us/Lite/ContactList.aspx?folder=Inbox&showUserFolders=False"
-    CONTACT_LIST_CSV_URL = "http://webmail.aol.com/#{AOL_NUM}/aim-2/en-us/Lite/ABExport.aspx?command=all"
     PROTOCOL_ERROR      = "AOL has changed its protocols, please upgrade this library first. If that does not work, dive into the code and submit a patch at http://github.com/cardmagic/contacts"
     
     def real_connect
@@ -80,7 +76,7 @@ class Contacts
         data, resp, cookies, forward, old_url = get(forward, cookies, old_url) + [forward]
       end
       
-      if data.index("Invalid Username or Password. Please try again.")
+      if data.index("Incorrect Username or Password.")
         raise AuthenticationError, "Username and password do not match"
       elsif data.index("Required field must not be blank")
         raise AuthenticationError, "Login and password must not be blank"
@@ -91,7 +87,11 @@ class Contacts
       elsif cookies == ""
         raise ConnectionError, PROTOCOL_ERROR
       end
- 
+
+      @aol_num = data.match(/URL=\"http:\/\/mail.aol.com\/(.*)\/aol-6\/en-us\/common\/error.aspx\?/)[1]
+      @contact_list_url    = "http://mail.aol.com/#{@aol_num}/aol-6/en-us/Lite/ContactList.aspx?folder=Inbox&showUserFolders=False"
+      @contact_list_csv_url = "http://mail.aol.com/#{@aol_num}/aol-6/en-us/Lite/ABExport.aspx?command=all"
+
       @cookies = cookies
     end
  
@@ -103,7 +103,7 @@ class Contacts
  
       return @contacts if @contacts
       if connected?
-        data, resp, cookies, forward, old_url = get(CONTACT_LIST_URL, @cookies, CONTACT_LIST_URL) + [CONTACT_LIST_URL]
+        data, resp, cookies, forward, old_url = get(@contact_list_url, @cookies, @contact_list_url) + [@contact_list_url]
  
         until forward.nil?
           data, resp, cookies, forward, old_url = get(forward, cookies, old_url) + [forward]
@@ -119,7 +119,7 @@ class Contacts
           postdata["user"] = input.attributes["value"] if input.attributes["name"] == "user"
         end
         
-        data, resp, cookies, forward, old_url = get(CONTACT_LIST_CSV_URL, @cookies, CONTACT_LIST_URL) + [CONTACT_LIST_URL]
+        data, resp, cookies, forward, old_url = get(@contact_list_csv_url, @cookies, @contact_list_url) + [@contact_list_url]
  
         until forward.nil?
           data, resp, cookies, forward, old_url = get(forward, cookies, old_url) + [forward]
@@ -132,14 +132,67 @@ class Contacts
         parse data
       end
     end
+    
+    def contacts_data
+      postdata = {
+        "file" => 'contacts',
+        "fileType" => 'csv'
+      }
+ 
+      if connected?
+        data, resp, cookies, forward, old_url = get(@contact_list_url, @cookies, @contact_list_url) + [@contact_list_url]
+ 
+        until forward.nil?
+          data, resp, cookies, forward, old_url = get(forward, cookies, old_url) + [forward]
+        end
+        
+        if resp.code_type != Net::HTTPOK
+          raise ConnectionError, self.class.const_get(:PROTOCOL_ERROR)
+        end
+ 
+        # parse data and grab <input name="user" value="8QzMPIAKs2" type="hidden">
+        doc = Hpricot(data)
+        (doc/:input).each do |input|
+          postdata["user"] = input.attributes["value"] if input.attributes["name"] == "user"
+        end
+        
+        data, resp, cookies, forward, old_url = get(@contact_list_csv_url, @cookies, @contact_list_url) + [@contact_list_url]
+ 
+        until forward.nil?
+          data, resp, cookies, forward, old_url = get(forward, cookies, old_url) + [forward]
+        end
+        
+        if data.include?("error.gif")
+          raise AuthenticationError, "Account invalid"
+        end
+        
+        data
+      end
+    end
+    
   private
     
     def parse(data, options={})
-      data = CSV::Reader.parse(data)
+      if CSV.const_defined? :Reader
+        data = CSV::Reader.parse(data)
+      else
+        if data.is_a?(String)
+          data = CSV.parse(data)
+        else
+          data = CSV.read(data)
+        end
+      end
       col_names = data.shift
-      @contacts = data.map do |person|
-        ["#{person[0]} #{person[1]}", person[4]] if person[4] && !person[4].empty?
-      end.compact
+      @contacts = []
+      data.each do |person|
+        if person[4] && !person[4].empty? 
+          @contacts << ["#{person[0]} #{person[1]}", person[4]]
+        end
+        if person[5] && !person[5].empty?
+          @contacts <<  ["#{person[0]} #{person[1]}", person[5]]  
+        end
+      end
+      @contacts
     end    
  
     def h_to_query_string(hash)
