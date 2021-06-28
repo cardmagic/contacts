@@ -149,6 +149,4 @@ class Contacts
       }.join("&")
     end
   end
- 
-  TYPES[:aol] = Aol
 end

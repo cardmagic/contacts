@@ -8,7 +8,13 @@ require "thread"
 require "erb"
 
 class Contacts
-  TYPES = {}
+  TYPES = [
+    :aol,
+    :gmail,
+    :hotmail,
+    :plaxo,
+    :yahoo
+  ].freeze
   VERSION = "1.2.4"
   
   class Base
@@ -210,16 +216,16 @@ class Contacts
   
   def self.new(type, login, password, options={})
     if TYPES.include?(type.to_s.intern)
-      TYPES[type.to_s.intern].new(login, password, options)
+      const_get(type.to_s.capitalize).new(login, password, options)
     else
       raise TypeNotFound, "#{type.inspect} is not a valid type, please choose one of the following: #{TYPES.keys.inspect}"
     end
   end
-  
+
   def self.guess(login, password, options={})
     TYPES.inject([]) do |a, t|
       begin
-        a + t[1].new(login, password, options).contacts
+        a + const_get(t.to_s.capitalize).new(login, password, options).contacts
       rescue AuthenticationError
         a
       end

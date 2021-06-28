@@ -63,6 +63,4 @@ class Contacts
     end
 
   end
-
-  TYPES[:mailru] = Mailru
 end

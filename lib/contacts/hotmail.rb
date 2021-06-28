@@ -110,9 +110,5 @@ class Contacts
     def get_contact_list_url(index) 
       "http://mpeople.live.com/default.aspx?pg=#{index}"
     end
-    
-    private
-    
-    TYPES[:hotmail] = Hotmail
   end
 end
