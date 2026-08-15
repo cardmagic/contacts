@@ -1,3 +1,8 @@
+Archived - no longer maintained
+================================
+
+This project is archived and no longer maintained.
+
 Welcome to Contacts
 ===================
 
@@ -65,4 +70,3 @@ Contributors
 * justintv
 
 This library is released under the terms of the BSD.
-
